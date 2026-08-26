@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Оформление заявки</title>
+  <style>
+    :root {
+      --accent: #e6007e;
+      --accent-dark: #bd0068;
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --text: #202124;
+      --muted: #6b7280;
+      --border: #dfe3e8;
+      --danger: #b42318;
+      --warning-bg: #fde7f3;
+      --warning-border: #e6007e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .container {
+      width: min(100%, 820px);
+      margin: 0 auto;
+      padding: 18px 12px 42px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: white;
+      border-radius: 18px;
+      padding: 24px 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 30px rgba(230, 0, 126, 0.18);
+    }
+
+    .header h1 {
+      margin: 0 0 6px;
+      font-size: clamp(25px, 6vw, 36px);
+    }
+
+    .header p {
+      margin: 0;
+      opacity: 0.94;
+    }
+
+    .manager-note {
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.16);
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .section {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .section h2 {
+      margin: 0 0 18px;
+      font-size: 20px;
+      color: var(--accent-dark);
+    }
+
+    .field {
+      margin-bottom: 17px;
+    }
+
+    .field:last-child { margin-bottom: 0; }
+
+    label, .label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    .required::after {
+      content: " *";
+      color: var(--danger);
+    }
+
+    .hint {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 12px 13px;
+      font-size: 16px;
+      background: white;
+      outline: none;
+      transition: border .2s, box-shadow .2s;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(230,0,126,.10);
+    }
+
+    .invalid-field {
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 0 3px rgba(180, 35, 24, .12) !important;
+    }
+
+    .field.invalid-field {
+      border: 1px solid var(--danger);
+      border-radius: 11px;
+      padding: 10px;
+      background: #fef3f2;
+    }
+
+    .warning {
+      background: var(--warning-bg);
+      border-left: 4px solid var(--warning-border);
+      padding: 12px 13px;
+      border-radius: 9px;
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+      gap: 9px;
+    }
+
+    .option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .option span {
+      display: block;
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 11px 10px;
+      cursor: pointer;
+      background: white;
+      transition: .2s;
+      user-select: none;
+    }
+
+    .option input:checked + span {
+      border-color: var(--accent);
+      background: rgba(230,0,126,.08);
+      color: var(--accent-dark);
+      font-weight: 700;
+      box-shadow: 0 0 0 2px rgba(230,0,126,.08);
+    }
+
+    .actions {
+      position: sticky;
+      bottom: 0;
+      padding: 12px 0 0;
+      background: linear-gradient(transparent, var(--bg) 25%);
+    }
+
+    .whatsapp-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 58px;
+      border: 0;
+      border-radius: 13px;
+      padding: 17px 22px;
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.25;
+      text-align: center;
+      text-decoration: none;
+      color: #fff;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(230,0,126,.23);
+      transition: background .15s ease, transform .15s ease;
+    }
+
+    .whatsapp-button:hover { background: var(--accent-dark); }
+    .whatsapp-button:active { transform: translateY(1px); }
+
+    .error-box {
+      display: none;
+      background: #fef3f2;
+      color: var(--danger);
+      border: 1px solid #fecdca;
+      border-radius: 11px;
+      padding: 12px;
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+
+    .privacy {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 520px) {
+      .section { padding: 17px 14px; }
+      .options { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Оформление заявки</h1>
+      <p>Заполните информацию по отправке. Все поля со звёздочкой обязательны.</p>
+      <div class="manager-note">
+        Заявка будет направлена менеджеру: <strong id="managerName">Ангелина</strong>
+      </div>
+    </header>
+
+    <form id="requestForm" novalidate>
+      <div id="errorBox" class="error-box"></div>
+
+      <section class="section">
+        <h2>АДРЕС ПРИЕМА ПОЧТЫ</h2>
+        <div class="field"><label for="pickupOrg">Наименование организации</label><input id="pickupOrg" name="pickupOrg" type="text" placeholder="Заполнять, если отправка от организации"></div>
+        <div class="field"><label class="required" for="pickupCity">Город</label><input id="pickupCity" name="pickupCity" type="text" required></div>
+        <div class="field"><label class="required" for="pickupAddress">Адрес</label><textarea id="pickupAddress" name="pickupAddress" required></textarea></div>
+        <div class="field"><label class="required" for="senderName">Контактное лицо (отправитель, ФИО)</label><input id="senderName" name="senderName" type="text" required></div>
+        <div class="field"><label class="required" for="senderPhone">Номер телефона отправителя</label><input id="senderPhone" name="senderPhone" type="tel" inputmode="tel" placeholder="+7 777 000 00 00" required></div>
+
+        <div class="field">
+          <div class="label required">Сможет ли клиент-отправитель заполнить накладную отправки?</div>
+          <div class="options">
+            <label class="option"><input type="radio" name="senderCanFillWaybill" value="Да" required><span>Да</span></label>
+            <label class="option"><input type="radio" name="senderCanFillWaybill" value="Нет"><span>Нет</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">Ориентировочное время забора почты</div>
+          <div class="options">
+            <label class="option"><input type="radio" name="pickupTime" value="9:00 - 11:00"><span>9:00 - 11:00</span></label>
+            <label class="option"><input type="radio" name="pickupTime" value="11:00 - 13:00"><span>11:00 - 13:00</span></label>
+            <label class="option"><input type="radio" name="pickupTime" value="14:00 - 16:00"><span>14:00 - 16:00</span></label>
+            <label class="option"><input type="radio" name="pickupTime" value="16:00 - 18:00"><span>16:00 - 18:00</span></label>
+          </div>
+          <span class="hint">Необязательно для заполнения.</span>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>ОПИСАНИЕ</h2>
+        <div class="warning">Отправление предоставляется в открытом виде!</div>
+        <div class="field"><label class="required" for="contents">Содержимое отправления</label><textarea id="contents" name="contents" required></textarea></div>
+        <div class="field"><label class="required" for="quantity">Количество отправлений</label><input id="quantity" name="quantity" type="number" inputmode="numeric" min="1" required></div>
+        <div class="field"><label class="required" for="weight">Фактический вес</label><input id="weight" name="weight" type="text" placeholder="Например: 0,5 кг" required></div>
+        <div class="field"><label class="required" for="dimensions">Размеры, см</label><input id="dimensions" name="dimensions" type="text" placeholder="Например: 30 × 20 × 10 см или формат А4" required><span class="hint">Для груза — с учетом веса и габаритов дополнительной упаковки.</span></div>
+
+        <div class="field"><div class="label required">Вид транспорта</div><div class="options">
+          <label class="option"><input type="radio" name="transport" value="Авиа" required><span>Авиа</span></label>
+          <label class="option"><input type="radio" name="transport" value="Наземный"><span>Наземный</span></label>
+        </div></div>
+
+        <div class="field"><div class="label required">Доверенность</div><div class="options">
+          <label class="option"><input type="radio" name="powerOfAttorney" value="Требуется" required><span>Требуется</span></label>
+          <label class="option"><input type="radio" name="powerOfAttorney" value="Не требуется"><span>Не требуется</span></label>
+        </div></div>
+
+        <div class="field"><div class="label required">Услуга «СРОЧНО» (за отдельную плату)</div><div class="options">
+          <label class="option"><input type="radio" name="urgent" value="Да" required><span>Да</span></label>
+          <label class="option"><input type="radio" name="urgent" value="Нет"><span>Нет</span></label>
+        </div></div>
+
+        <div class="field"><div class="label required">Услуга «СВЕРХСРОЧНО» (за отдельную плату)</div><div class="options">
+          <label class="option"><input type="radio" name="superUrgent" value="Да" required><span>Да</span></label>
+          <label class="option"><input type="radio" name="superUrgent" value="Нет"><span>Нет</span></label>
+        </div></div>
+
+        <div class="field"><div class="label required">Услуга «Уведомление о доставке» (за отдельную плату)</div><div class="options">
+          <label class="option"><input type="radio" name="deliveryNotice" value="Да" required><span>Да</span></label>
+          <label class="option"><input type="radio" name="deliveryNotice" value="Нет"><span>Нет</span></label>
+        </div></div>
+      </section>
+
+      <section class="section">
+        <h2>АДРЕС ДОСТАВКИ</h2>
+        <div class="field"><label for="deliveryOrg">Наименование организации</label><input id="deliveryOrg" name="deliveryOrg" type="text" placeholder="Заполнять, если отправка на организацию"></div>
+        <div class="field"><label class="required" for="deliveryCity">Город</label><input id="deliveryCity" name="deliveryCity" type="text" required></div>
+        <div class="field"><label class="required" for="deliveryAddress">Адрес</label><textarea id="deliveryAddress" name="deliveryAddress" required></textarea></div>
+        <div class="field"><label class="required" for="recipientName">Контактное лицо (получатель, ФИО)</label><input id="recipientName" name="recipientName" type="text" required></div>
+        <div class="field"><label class="required" for="recipientPhone">Номер телефона получателя</label><input id="recipientPhone" name="recipientPhone" type="tel" inputmode="tel" placeholder="+7 777 000 00 00" required></div>
+      </section>
+
+      <section class="section">
+        <h2>УСЛОВИЯ</h2>
+
+        <div class="field"><div class="label required">Произвести дополнительную упаковку груза за отдельную плату</div><div class="options">
+          <label class="option"><input type="radio" name="extraPacking" value="Да" required><span>Да</span></label>
+          <label class="option"><input type="radio" name="extraPacking" value="Нет"><span>Нет</span></label>
+        </div></div>
+
+        <div class="field"><div class="label required">Груз относится к категории хрупких грузов и требует маркировки «Осторожно, стекло»</div><div class="options">
+          <label class="option"><input type="radio" name="fragile" value="Да" required><span>Да</span></label>
+          <label class="option"><input type="radio" name="fragile" value="Нет"><span>Нет</span></label>
+        </div></div>
+
+        <div class="field"><div class="label required">Гарантирую оплату</div><div class="options">
+          <label class="option"><input type="radio" name="paymentGuarantor" value="Отправителем" required><span>Отправителем</span></label>
+          <label class="option"><input type="radio" name="paymentGuarantor" value="Получателем"><span>Получателем</span></label>
+          <label class="option"><input type="radio" name="paymentGuarantor" value="Третьим лицом"><span>Третьим лицом</span></label>
+        </div></div>
+
+        <div class="field"><div class="label required">Оплата</div><div class="options">
+          <label class="option"><input type="radio" name="paymentMethod" value="По договору" required><span>По договору</span></label>
+          <label class="option"><input type="radio" name="paymentMethod" value="Наличными"><span>Наличными</span></label>
+          <label class="option"><input type="radio" name="paymentMethod" value="Приложение Kaspi / Halyk"><span>Приложение Kaspi / Halyk</span></label>
+        </div></div>
+      </section>
+
+      <section class="section">
+        <h2>ДАННЫЕ ЗАКАЗЧИКА (ВАШИ ДАННЫЕ)</h2>
+        <div class="field"><label class="required" for="customerName">ФИО / Наименование организации</label><input id="customerName" name="customerName" type="text" required></div>
+        <div class="field"><label class="required" for="customerId">ИИН / БИН</label><input id="customerId" name="customerId" type="text" inputmode="numeric" maxlength="12" placeholder="12 цифр" required></div>
+        <div class="field"><label class="required" for="customerPhone">Номер телефона</label><input id="customerPhone" name="customerPhone" type="tel" inputmode="tel" placeholder="+7 777 000 00 00" required></div>
+        <div class="field"><label class="required" for="customerCity">Из какого города вы обращаетесь?</label><input id="customerCity" name="customerCity" type="text" required></div>
+      </section>
+
+      <div class="actions">
+        <a id="whatsappButton" class="whatsapp-button" href="#">Нажмите, чтобы отправить форму на WhatsApp</a>
+      </div>
+
+      <div class="privacy">Введённые данные нигде не сохраняются и используются только для формирования сообщения в WhatsApp.</div>
+    </form>
+  </div>
+
+  <script>
+    const MANAGERS = {
+      angelina: {
+        name: 'Ангелина',
+        phone: '77476970753'
+      }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const managerKey = (params.get('manager') || 'angelina').toLowerCase();
+    const manager = MANAGERS[managerKey] || MANAGERS.angelina;
+
+    document.getElementById('managerName').textContent = manager.name;
+
+    const form = document.getElementById('requestForm');
+    const errorBox = document.getElementById('errorBox');
+    const whatsappButton = document.getElementById('whatsappButton');
+
+    function value(name) {
+      const element = form.elements[name];
+      if (!element) return '';
+      if (element instanceof RadioNodeList) return (element.value || '').trim();
+      return (element.value || '').trim();
+    }
+
+    function normalizeOptional(text) {
+      return text ? text : 'НЕТ';
+    }
+
+    function validateCustomerId(id) {
+      return /^\d{12}$/.test(id.replace(/\s+/g, ''));
+    }
+
+    function createRequestMeta() {
+      const now = new Date();
+
+      const date = new Intl.DateTimeFormat('ru-RU', {
+        timeZone: 'Asia/Almaty',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).format(now);
+
+      const time = new Intl.DateTimeFormat('ru-RU', {
+        timeZone: 'Asia/Almaty',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).format(now);
+
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Almaty',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).formatToParts(now).reduce((acc, part) => {
+        acc[part.type] = part.value;
+        return acc;
+      }, {});
+
+      const random = Math.floor(100 + Math.random() * 900);
+      const id = `RIKA-${parts.year}${parts.month}${parts.day}-${parts.hour}${parts.minute}${parts.second}-${random}`;
+
+      return { date, time, id };
+    }
+
+    function buildMessage(meta) {
+      return [
+        '*Новая заявка (упр. Г/О)*',
+        '',
+        `Дата: ${meta.date}`,
+        `Время: ${meta.time}`,
+        `ID заявки: ${meta.id}`,
+        '',
+        '*АДРЕС ПРИЕМА ПОЧТЫ*',
+        '',
+        `- Наименование организации: ${normalizeOptional(value('pickupOrg'))}`,
+        `- Город: ${value('pickupCity')}`,
+        `- Адрес: ${value('pickupAddress')}`,
+        `- Контактное лицо (отправитель, ФИО): ${value('senderName')}`,
+        `- Номер телефона (отправителя): ${value('senderPhone')}`,
+        `- Сможет ли клиент-отправитель заполнить накладную отправки?: ${value('senderCanFillWaybill')}`,
+        `- Ориентировочное время забора почты: ${value('pickupTime') || 'Не указано'}`,
+        '',
+        '*ОПИСАНИЕ*',
+        '',
+        `- Содержимое отправления (Отправление предоставляется в открытом виде!!!): ${value('contents')}`,
+        `- Количество отправлений: ${value('quantity')}`,
+        `- Фактический Вес: ${value('weight')}`,
+        `- Размеры, см (для груза с учетом веса и габаритов дополнительной упаковки): ${value('dimensions')}`,
+        `- Вид транспорта: ${value('transport')}`,
+        `- Доверенность: ${value('powerOfAttorney')}`,
+        `- Услуга "СРОЧНО" (за отдельную плату): ${value('urgent')}`,
+        `- Услуга "СВЕРХСРОЧНО" (за отдельную плату): ${value('superUrgent')}`,
+        `- Услуга "Уведомление о доставке" (за отдельную плату): ${value('deliveryNotice')}`,
+        '',
+        '*АДРЕС ДОСТАВКИ*',
+        '',
+        `- Наименование организации: ${normalizeOptional(value('deliveryOrg'))}`,
+        `- Город: ${value('deliveryCity')}`,
+        `- Адрес: ${value('deliveryAddress')}`,
+        `- Контактное лицо (получатель, ФИО): ${value('recipientName')}`,
+        `- Номер телефона (получателя): ${value('recipientPhone')}`,
+        '',
+        '*УСЛОВИЯ*',
+        '',
+        `- Произвести дополнительную упаковку груза за отдельную плату: ${value('extraPacking')}`,
+        `- Груз относится к категории хрупких грузов и требует маркировки «Осторожно, стекло»: ${value('fragile')}`,
+        `- Гарантирую оплату: ${value('paymentGuarantor')}`,
+        `- Оплата: ${value('paymentMethod')}`,
+        '',
+        '*ДАННЫЕ ЗАКАЗЧИКА (ВАШИ ДАННЫЕ)*',
+        '',
+        `- ФИО/Наименование организации: ${value('customerName')}`,
+        `- ИИН/БИН: ${value('customerId')}`,
+        `- Номер телефона: ${value('customerPhone')}`,
+        `- Из какого города вы обращаетесь?: ${value('customerCity')}`
+      ].join('\n');
+    }
+
+    function showFormError(message, field) {
+      errorBox.textContent = message;
+      errorBox.style.display = 'block';
+
+      if (field) {
+        field.classList.add('invalid-field');
+        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (typeof field.focus === 'function') {
+          setTimeout(() => field.focus({ preventScroll: true }), 300);
+        }
+      } else {
+        errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function clearValidationState() {
+      errorBox.style.display = 'none';
+      errorBox.textContent = '';
+      form.querySelectorAll('.invalid-field').forEach(element => {
+        element.classList.remove('invalid-field');
+      });
+    }
+
+    function findFirstInvalidField() {
+      const requiredFields = Array.from(form.querySelectorAll('input[required], textarea[required]'));
+      const checkedGroups = new Set();
+
+      for (const field of requiredFields) {
+        if (field.type === 'radio') {
+          if (checkedGroups.has(field.name)) continue;
+          checkedGroups.add(field.name);
+
+          const group = Array.from(form.querySelectorAll(`input[type="radio"][name="${field.name}"]`));
+          if (!group.some(radio => radio.checked)) {
+            return field.closest('.field') || field;
+          }
+        } else if (!field.value.trim()) {
+          return field;
+        }
+      }
+
+      return null;
+    }
+
+    form.addEventListener('submit', event => event.preventDefault());
+
+    form.addEventListener('input', event => {
+      event.target.classList.remove('invalid-field');
+    });
+
+    form.addEventListener('change', event => {
+      const fieldBlock = event.target.closest('.field');
+      if (fieldBlock) fieldBlock.classList.remove('invalid-field');
+    });
+
+    whatsappButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      clearValidationState();
+
+      const firstInvalidField = findFirstInvalidField();
+
+      if (firstInvalidField) {
+        showFormError('Заполните все обязательные поля.', firstInvalidField);
+        return;
+      }
+
+      const customerId = value('customerId').replace(/\s+/g, '');
+
+      if (!validateCustomerId(customerId)) {
+        showFormError(
+          'ИИН/БИН должен содержать ровно 12 цифр.',
+          document.getElementById('customerId')
+        );
+        return;
+      }
+
+      const message = buildMessage(createRequestMeta());
+      const whatsappUrl =
+        `https://api.whatsapp.com/send?phone=${manager.phone}&text=${encodeURIComponent(message)}`;
+
+      window.location.href = whatsappUrl;
+    });
+  </script>
+</body>
+</html>
