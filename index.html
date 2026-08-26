@@ -712,7 +712,7 @@
 
       const message = buildMessage(createRequestMeta());
       const whatsappUrl =
-        `https://api.whatsapp.com/send?phone=${manager.phone}&text=${encodeURIComponent(message)}`;
+        `https://wa.me/${manager.phone}?text=${encodeURIComponent(message)}`;
 
       window.location.href = whatsappUrl;
     });
