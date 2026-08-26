@@ -238,7 +238,7 @@
       <h1>Оформление заявки</h1>
       <p>Заполните информацию по отправке. Все поля со звёздочкой обязательны.</p>
       <div class="manager-note">
-        Заявка будет направлена менеджеру: <strong id="managerName">Ангелина</strong>
+        Заявка будет направлена менеджеру <strong id="managerName"></strong>
       </div>
     </header>
 
@@ -360,17 +360,163 @@
 
   <script>
     const MANAGERS = {
-      angelina: {
-        name: 'Ангелина',
-        phone: '77476970753'
+      aktau1: {
+        city: 'г. Актау',
+        phone: '77016486629'
+      },
+      aktau2: {
+        city: 'г. Актау',
+        phone: '77017812320'
+      },
+      aktobe1: {
+        city: 'г. Актобе',
+        phone: '77010814098'
+      },
+      aktobe2: {
+        city: 'г. Актобе',
+        phone: '77014858358'
+      },
+      almaty1: {
+        city: 'г. Алматы',
+        phone: '77015317609'
+      },
+      almaty2: {
+        city: 'г. Алматы',
+        phone: '77019813765'
+      },
+      almaty3: {
+        city: 'г. Алматы',
+        phone: '77015317611'
+      },
+      almaty4: {
+        city: 'г. Алматы',
+        phone: '77010827609'
+      },
+      almaty5: {
+        city: 'г. Алматы',
+        phone: '77013152536'
+      },
+      almaty6: {
+        city: 'г. Алматы',
+        phone: '77014850970'
+      },
+      astana1: {
+        city: 'г. Астана',
+        phone: '77015699154'
+      },
+      astana2: {
+        city: 'г. Астана',
+        phone: '77014858347'
+      },
+      astana3: {
+        city: 'г. Астана',
+        phone: '77013152534'
+      },
+      astana4: {
+        city: 'г. Астана',
+        phone: '77014858351'
+      },
+      astana5: {
+        city: 'г. Астана',
+        phone: '77010570952'
+      },
+      astana6: {
+        city: 'г. Астана',
+        phone: '77013952844'
+      },
+      astana7: {
+        city: 'г. Астана',
+        phone: '77019813764'
+      },
+      astana8: {
+        city: 'г. Астана',
+        phone: '77015317608'
+      },
+      astana9: {
+        city: 'г. Астана',
+        phone: '77014858350'
+      },
+      astana10: {
+        city: 'г. Астана',
+        phone: '77789968454'
+      },
+      atyrau1: {
+        city: 'г. Атырау',
+        phone: '77018131473'
+      },
+      atyrau2: {
+        city: 'г. Атырау',
+        phone: '77018006168'
+      },
+      atyrau3: {
+        city: 'г. Атырау',
+        phone: '77010840147'
+      },
+      zhanaozen1: {
+        city: 'г. Жанаозен',
+        phone: '77010811479'
+      },
+      karaganda1: {
+        city: 'г. Караганда',
+        phone: '77012316551'
+      },
+      karaganda2: {
+        city: 'г. Караганда',
+        phone: '77018132107'
+      },
+      pavlodar1: {
+        city: 'г. Павлодар',
+        phone: '77018132084'
+      },
+      semey1: {
+        city: 'г. Семей',
+        phone: '77010829313'
+      },
+      taraz1: {
+        city: 'г. Тараз',
+        phone: '77013952849'
+      },
+      taraz2: {
+        city: 'г. Тараз',
+        phone: '77013952812'
+      },
+      uralsk1: {
+        city: 'г. Уральск',
+        phone: '77010570951'
+      },
+      uralsk2: {
+        city: 'г. Уральск',
+        phone: '77013096799'
+      },
+      shymkent1: {
+        city: 'г. Шымкент',
+        phone: '77750074577'
+      },
+      shymkent2: {
+        city: 'г. Шымкент',
+        phone: '77786438423'
+      },
+      shymkent3: {
+        city: 'г. Шымкент',
+        phone: '77013096791'
+      },
+      kostanay1: {
+        city: 'г. Костанай',
+        phone: '77015329602'
       }
     };
 
     const params = new URLSearchParams(window.location.search);
-    const managerKey = (params.get('manager') || 'angelina').toLowerCase();
-    const manager = MANAGERS[managerKey] || MANAGERS.angelina;
+    const managerKey = (params.get('m') || '').toLowerCase();
+    const manager = MANAGERS[managerKey];
 
-    document.getElementById('managerName').textContent = manager.name;
+    const managerNameElement = document.getElementById('managerName');
+
+    if (!manager) {
+      managerNameElement.textContent = '— ссылка некорректна';
+    } else {
+      managerNameElement.textContent = manager.city;
+    }
 
     const form = document.getElementById('requestForm');
     const errorBox = document.getElementById('errorBox');
@@ -541,6 +687,11 @@
     whatsappButton.addEventListener('click', function(event) {
       event.preventDefault();
       clearValidationState();
+
+      if (!manager) {
+        showFormError('Некорректная ссылка. Обратитесь к менеджеру за актуальной ссылкой на форму.');
+        return;
+      }
 
       const firstInvalidField = findFirstInvalidField();
 
