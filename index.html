@@ -22,7 +22,7 @@
 
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: Arial, "Segoe UI", "Noto Sans", sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.45;
@@ -194,7 +194,7 @@
       padding: 17px 22px;
       font-family: inherit;
       font-size: 18px;
-      font-weight: 800;
+      font-weight: 700;
       line-height: 1.25;
       text-align: center;
       text-decoration: none;
@@ -204,6 +204,8 @@
       box-shadow: 0 8px 20px rgba(230,0,126,.23);
       transition: background .15s ease, transform .15s ease;
     }
+
+    html[lang="kk"] .whatsapp-button { font-family: "Segoe UI", Arial, "Noto Sans", sans-serif; font-weight: 700; }
 
     .whatsapp-button:hover { background: var(--accent-dark); }
     .whatsapp-button:active { transform: translateY(1px); }
@@ -230,10 +232,36 @@
       .section { padding: 17px 14px; }
       .options { grid-template-columns: 1fr 1fr; }
     }
+    .language-gate { position: fixed; inset: 0; z-index: 1000; background: #f6f7f9; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .language-card { background: white; border-radius: 22px; padding: 35px 25px; width: min(100%, 470px); text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,.10); }
+    .language-card h1 { color: #bd0068; margin: 0 0 12px; font-size: 28px; }
+    .language-card p { color: #5f6672; margin: 0 0 25px; }
+    .language-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .language-choice { cursor: pointer; background: #fff; border: 2px solid #e5e7eb; border-radius: 16px; padding: 22px 8px; font-size: 17px; font-weight: 700; color: #202124; }
+    .language-choice:hover, .language-choice:focus-visible { border-color: #e6007e; background: #fff2f9; }
+    .language-choice .flag { display: block; font-size: 43px; margin-bottom: 8px; }
+    .language-switch { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
+    .language-switch button { cursor: pointer; border: 1px solid #dfe3e8; background: white; border-radius: 9px; padding: 8px 12px; font-weight: 700; }
+    .language-switch button.active { color: #bd0068; border-color: #e6007e; background: #fff2f9; }
+    @media (max-width: 360px) { .language-choices { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div id="languageGate" class="language-gate" role="dialog" aria-modal="true" aria-labelledby="languageTitle">
+    <div class="language-card">
+      <h1 id="languageTitle">Тілді таңдаңыз / Выберите язык</h1>
+      <p>Өтінімді ресімдеу тілі / Язык оформления заявки</p>
+      <div class="language-choices">
+        <button type="button" class="language-choice" data-choose-lang="kz"><span class="flag" aria-hidden="true">🇰🇿</span>Қазақша</button>
+        <button type="button" class="language-choice" data-choose-lang="ru"><span class="flag" aria-hidden="true">🇷🇺</span>Русский</button>
+      </div>
+    </div>
+  </div>
+  <div class="container" id="mainContainer" hidden>
+    <nav class="language-switch" aria-label="Тілді ауыстыру / Смена языка">
+      <button type="button" data-switch-lang="kz">🇰🇿 KZ</button>
+      <button type="button" data-switch-lang="ru">🇷🇺 RUS</button>
+    </nav>
     <header class="header">
       <h1>Оформление заявки</h1>
       <p>Заполните информацию по отправке. Все поля со звёздочкой обязательны.</p>
@@ -242,7 +270,7 @@
       </div>
     </header>
 
-    <form id="requestForm" novalidate>
+    <div style="padding:12px;background:#fff4ce;border-radius:10px;margin:12px 0">ТЕСТ / СЫНАҚ — WhatsApp не отправляется / WhatsApp-қа жіберілмейді</div><form id="requestForm" novalidate>
       <div id="errorBox" class="error-box"></div>
 
       <section class="section">
@@ -359,6 +387,121 @@
   </div>
 
   <script>
+    const KZ_TRANSLATIONS = {
+  "Оформление заявки": "Өтінімді рәсімдеу",
+  "Заполните информацию по отправке. Все поля со звёздочкой обязательны.": "Жөнелтілім туралы ақпаратты толтырыңыз. Жұлдызшасы бар барлық жолдар толтыруға міндетті.",
+  "Заявка будет направлена менеджеру": "Өтінім менеджерге жіберіледі",
+  "— ссылка некорректна": "— сілтеме қате",
+  "АДРЕС ПРИЕМА ПОЧТЫ": "ПОШТАНЫ ҚАБЫЛДАУ МЕКЕНЖАЙЫ",
+  "Наименование организации": "Ұйымның атауы",
+  "Заполнять, если отправка от организации": "Ұйым атынан жіберілсе, толтырыңыз",
+  "Город": "Қала",
+  "Адрес": "Мекенжай",
+  "Контактное лицо (отправитель, ФИО)": "Байланыс тұлғасы (Жіберушінің Т.А.Ә.)",
+  "Номер телефона отправителя": "Жіберушінің телефон нөмірі",
+  "Сможет ли клиент-отправитель заполнить накладную отправки?": "Жіберуші клиент жүкқұжатты өзі толтыра ала ма?",
+  "Да": "Иә",
+  "Нет": "Жоқ",
+  "Ориентировочное время забора почты": "Поштаны алып кетудің болжамды уақыты",
+  "Необязательно для заполнения.": "Толтыру міндетті емес.",
+  "ОПИСАНИЕ": "СИПАТТАМА",
+  "Отправление предоставляется в открытом виде!": "Жөнелтілім ашық күйінде ұсынылуы тиіс!",
+  "Содержимое отправления": "Жөнелтілімнің ішіндегісі",
+  "Количество отправлений": "Жөнелтілім саны",
+  "Фактический вес": "Нақты салмағы",
+  "Например: 0,5 кг": "Мысалы: 0,5 кг",
+  "Размеры, см": "Өлшемдері, см",
+  "Например: 30 × 20 × 10 см или формат А4": "Мысалы: 30 × 20 × 10 см немесе А4 форматы",
+  "Для груза — с учетом веса и габаритов дополнительной упаковки.": "Жүк үшін қосымша қаптаманың салмағы мен өлшемдерін ескеріңіз.",
+  "Вид транспорта": "Көлік түрі",
+  "Авиа": "Әуе",
+  "Наземный": "Жерүсті",
+  "Доверенность": "Сенімхат",
+  "Требуется": "Қажет",
+  "Не требуется": "Қажет емес",
+  "Услуга «СРОЧНО» (за отдельную плату)": "«ШҰҒЫЛ» қызметі (қосымша ақыға)",
+  "Услуга «СВЕРХСРОЧНО» (за отдельную плату)": "«АСА ШҰҒЫЛ» қызметі (қосымша ақыға)",
+  "Услуга «Уведомление о доставке» (за отдельную плату)": "«Жеткізу туралы хабарлама» қызметі (қосымша ақыға)",
+  "АДРЕС ДОСТАВКИ": "ЖЕТКІЗУ МЕКЕНЖАЙЫ",
+  "Заполнять, если отправка на организацию": "Ұйымның атына жіберілсе, толтырыңыз",
+  "Контактное лицо (получатель, ФИО)": "Байланыс тұлғасы (алушының Т.А.Ә.)",
+  "Номер телефона получателя": "Алушының телефон нөмірі",
+  "УСЛОВИЯ": "ШАРТТАР",
+  "Произвести дополнительную упаковку груза за отдельную плату": "Жүкті қосымша ақыға қаптау",
+  "Груз относится к категории хрупких грузов и требует маркировки «Осторожно, стекло»": "Жүк осал жүктер санатына жатады және «Абайлаңыз, шыны» деген таңбалауды талап етеді",
+  "Гарантирую оплату": "Төлеуге кепілдік беремін",
+  "Отправителем": "Жіберуші",
+  "Получателем": "Алушы",
+  "Третьим лицом": "Үшінші тұлға",
+  "Оплата": "Төлем тәсілі",
+  "По договору": "Шарт бойынша",
+  "Наличными": "Қолма-қол",
+  "Приложение Kaspi / Halyk": "Kaspi / Halyk қосымшасы",
+  "ДАННЫЕ ЗАКАЗЧИКА (ВАШИ ДАННЫЕ)": "ТАПСЫРЫС БЕРУШІНІҢ ДЕРЕКТЕРІ (СІЗДІҢ ДЕРЕКТЕРІҢІЗ)",
+  "ФИО / Наименование организации": "Т.А.Ә. / Ұйымның атауы",
+  "ИИН / БИН": "ЖСН / БСН",
+  "12 цифр": "12 сан",
+  "Номер телефона": "Телефон нөмірі",
+  "Из какого города вы обращаетесь?": "Қай қаладан хабарласып тұрсыз?",
+  "Нажмите, чтобы отправить форму на WhatsApp": "Өтінімді WhatsApp арқылы жіберу үшін басыңыз",
+  "Введённые данные нигде не сохраняются и используются только для формирования сообщения в WhatsApp.": "Енгізілген деректер еш жерде сақталмайды және тек WhatsApp хабарламасын қалыптастыру үшін пайдаланылады.",
+  "НЕТ": "ЖОҚ",
+  "Не указано": "Көрсетілмеген",
+  "Некорректная ссылка. Обратитесь к менеджеру за актуальной ссылкой на форму.": "Қате сілтеме. Нысанға өзекті сілтеме алу үшін менеджерге хабарласыңыз.",
+  "Заполните все обязательные поля.": "Барлық міндетті жолдарды толтырыңыз.",
+  "ИИН/БИН должен содержать ровно 12 цифр.": "ЖСН/БСН тура 12 саннан тұруы тиіс.",
+  "Новая заявка (упр. Г/О)": "Жаңа өтінім (Жеңілдетілген кепілдік міндеттеме)",
+  "Дата": "Күні",
+  "Время": "Уақыты",
+  "ID заявки": "Өтінім ID",
+  "Номер телефона (отправителя)": "Жіберушінің телефон нөмірі",
+  "Содержимое отправления (Отправление предоставляется в открытом виде!!!)": "Жөнелтілімнің ішіндегісі (жөнелтілім ашық күйінде ұсынылады!!!)",
+  "Фактический Вес": "Нақты салмағы",
+  "Размеры, см (для груза с учетом веса и габаритов дополнительной упаковки)": "Өлшемдері, см (қосымша қаптаманың салмағы мен өлшемдерін ескере отырып)",
+  "Услуга \"СРОЧНО\" (за отдельную плату)": "«ШҰҒЫЛ» қызметі (қосымша ақыға)",
+  "Услуга \"СВЕРХСРОЧНО\" (за отдельную плату)": "«АСА ШҰҒЫЛ» қызметі (қосымша ақыға)",
+  "Услуга \"Уведомление о доставке\" (за отдельную плату)": "«Жеткізу туралы хабарлама» қызметі (қосымша ақыға)",
+  "Номер телефона (получателя)": "Алушының телефон нөмірі",
+  "ФИО/Наименование организации": "Т.А.Ә./Ұйымның атауы",
+  "ИИН/БИН": "ЖСН/БСН"
+};
+    const KZ_CITIES = {"г. Актау": "Ақтау қ.", "г. Актобе": "Ақтөбе қ.", "г. Алматы": "Алматы қ.", "г. Астана": "Астана қ.", "г. Атырау": "Атырау қ.", "г. Жанаозен": "Жаңаөзен қ.", "г. Караганда": "Қарағанды қ.", "г. Павлодар": "Павлодар қ.", "г. Семей": "Семей қ.", "г. Тараз": "Тараз қ.", "г. Уральск": "Орал қ.", "г. Шымкент": "Шымкент қ.", "г. Костанай": "Қостанай қ."};
+    let currentLanguage = null;
+    const translatableElements = Array.from(document.querySelectorAll('#mainContainer h1, #mainContainer h2, #mainContainer p, #mainContainer .manager-note, #mainContainer .field label:not(.option), #mainContainer .field .label, #mainContainer .field .hint, #mainContainer .field .option span, #mainContainer .warning, #mainContainer .privacy, #mainContainer #whatsappButton'));
+    const originalText = new Map(translatableElements.map(el => [el, el === document.querySelector('.manager-note') ? 'Заявка будет направлена менеджеру' : el.textContent.trim()]));
+    const translatablePlaceholders = Array.from(document.querySelectorAll('#mainContainer [placeholder]'));
+    const originalPlaceholders = new Map(translatablePlaceholders.map(el => [el, el.placeholder]));
+    const originalRadioValues = new Map(Array.from(document.querySelectorAll('input[type="radio"]')).map(el => [el, el.value]));
+    function translate(text) { return currentLanguage === 'kz' ? (KZ_TRANSLATIONS[text] || text) : text; }
+    function applyLanguage(lang) {
+      currentLanguage = lang;
+      document.documentElement.lang = lang === 'kz' ? 'kk' : 'ru';
+      document.title = translate('Оформление заявки');
+      if (typeof manager !== 'undefined') managerNameElement.textContent = manager ? (lang === 'kz' ? (KZ_CITIES[manager.city] || manager.city) : manager.city) : translate('— ссылка некорректна');
+      for (const [el, original] of originalText) {
+        if (el.classList.contains('manager-note')) {
+          // Keep the live manager name element and its routing intact.
+          el.firstChild.textContent = translate('Заявка будет направлена менеджеру') + ' ';
+        } else { el.textContent = translate(original); }
+      }
+      for (const [el, original] of originalPlaceholders) el.placeholder = translate(original);
+      for (const [el, original] of originalRadioValues) el.value = translate(original);
+      document.querySelectorAll('[data-switch-lang]').forEach(el => {
+        el.classList.toggle('active', el.dataset.switchLang === lang);
+        el.setAttribute('aria-pressed', String(el.dataset.switchLang === lang));
+      });
+      document.getElementById('errorBox').style.display = 'none';
+    }
+    function chooseLanguage(lang) {
+      applyLanguage(lang);
+      document.getElementById('languageGate').hidden = true;
+      document.getElementById('languageGate').style.display = 'none';
+      document.getElementById('mainContainer').hidden = false;
+    }
+    document.querySelectorAll('[data-choose-lang]').forEach(el => el.addEventListener('click', () => chooseLanguage(el.dataset.chooseLang)));
+    document.querySelectorAll('[data-switch-lang]').forEach(el => el.addEventListener('click', () => applyLanguage(el.dataset.switchLang)));
+    // No language is stored; every new visit begins with the language chooser.
+
     const MANAGERS = {
       aktau1: {
         city: 'г. Актау',
@@ -534,7 +677,7 @@
     }
 
     function normalizeOptional(text) {
-      return text ? text : 'НЕТ';
+      return text ? text : translate('НЕТ');
     }
 
     function validateCustomerId(id) {
@@ -580,7 +723,7 @@
     }
 
     function buildMessage(meta) {
-      return [
+      const lines = [
         '*Новая заявка (упр. Г/О)*',
         '',
         `Дата: ${meta.date}`,
@@ -595,7 +738,7 @@
         `- Контактное лицо (отправитель, ФИО): ${value('senderName')}`,
         `- Номер телефона (отправителя): ${value('senderPhone')}`,
         `- Сможет ли клиент-отправитель заполнить накладную отправки?: ${value('senderCanFillWaybill')}`,
-        `- Ориентировочное время забора почты: ${value('pickupTime') || 'Не указано'}`,
+        `- Ориентировочное время забора почты: ${value('pickupTime') || translate('Не указано')}`,
         '',
         '*ОПИСАНИЕ*',
         '',
@@ -630,7 +773,18 @@
         `- ИИН/БИН: ${value('customerId')}`,
         `- Номер телефона: ${value('customerPhone')}`,
         `- Из какого города вы обращаетесь?: ${value('customerCity')}`
-      ].join('\n');
+      ];
+      if (currentLanguage !== 'kz') return lines.join('\n');
+      return lines.map(line => {
+        if (line.startsWith('*') && line.endsWith('*')) return '*' + translate(line.slice(1, -1)) + '*';
+        if (line.startsWith('- ')) {
+          const pos = line.indexOf(': ');
+          if (pos > -1) return '- ' + translate(line.slice(2, pos)) + ': ' + line.slice(pos + 2);
+        }
+        const pos = line.indexOf(': ');
+        if (pos > -1) return translate(line.slice(0, pos)) + ': ' + line.slice(pos + 2);
+        return line;
+      }).join('\n');
     }
 
     function showFormError(message, field) {
@@ -693,14 +847,14 @@
       clearValidationState();
 
       if (!manager) {
-        showFormError('Некорректная ссылка. Обратитесь к менеджеру за актуальной ссылкой на форму.');
+        showFormError(translate('Некорректная ссылка. Обратитесь к менеджеру за актуальной ссылкой на форму.'));
         return;
       }
 
       const firstInvalidField = findFirstInvalidField();
 
       if (firstInvalidField) {
-        showFormError('Заполните все обязательные поля.', firstInvalidField);
+        showFormError(translate('Заполните все обязательные поля.'), firstInvalidField);
         return;
       }
 
@@ -708,7 +862,7 @@
 
       if (!validateCustomerId(customerId)) {
         showFormError(
-          'ИИН/БИН должен содержать ровно 12 цифр.',
+          translate('ИИН/БИН должен содержать ровно 12 цифр.'),
           document.getElementById('customerId')
         );
         return;
